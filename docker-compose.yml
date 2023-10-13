@@ -1,0 +1,45 @@
+name: traxlrs
+services:
+  lrs:
+    build:
+      context: .
+    volumes:
+      - lrs-data:/lrs/storage/
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgresql
+      - DB_PORT=5432
+      - DB_DATABASE=lrs
+      - DB_USERNAME=lrs
+      - DB_PASSWORD=lrs
+      - APP_NAME=TRAX LRS
+      - APP_ENV=local
+      - APP_KEY=base64:mlUsivEGy5Yqm/Db0jLykqFUfDpUbW4GqxfY6+3P0BQ=
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8080
+      - XAPI_STATEMENTS_AUTHORITY_NAME=testLRS
+      - XAPI_STATEMENTS_AUTHORITY_HOMEPAGE=http://localhost:8080
+    ports:
+      - '8080:80'
+  postgresql:
+    image: postgres:15.4
+    volumes:
+      - pgsql-data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=lrs
+      - POSTGRES_PASSWORD=lrs
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # If you want to expose these ports outside your dev PC,
+    # remove the "127.0.0.1:" prefix
+    ports:
+      - 127.0.0.1:5432:5432
+volumes:
+  pgsql-data:
+      driver: local
+  lrs-data:
+      driver: local
